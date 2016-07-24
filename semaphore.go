@@ -46,6 +46,14 @@ func (sem *Semaphore) AquireN(n int) (err error) {
 	return err
 }
 
+// AquireNUnsafe function is the same as AquireN except it won't return error if N > cap(sem).
+// It will simply block until semaphore is incremented N times.
+func (sem *Semaphore) AquireNUnsafe(n int) {
+	for i := 0; i < n; i++ {
+		sem.Aquire()
+	}
+}
+
 // ReleaseN function decrements semaphore by N. It will return error if N > cap(sem).
 func (sem *Semaphore) ReleaseN(n int) (err error) {
 	if cap(sem.body) < n {
@@ -58,6 +66,14 @@ func (sem *Semaphore) ReleaseN(n int) (err error) {
 	}
 
 	return err
+}
+
+// ReleaseNUnsafe function is the same as ReleaseN except it won't return error if N > cap(sem).
+// It will simply block until semaphore is decremented N times.
+func (sem *Semaphore) ReleaseNUnsafe(n int) {
+	for i := 0; i < n; i++ {
+		sem.Release()
+	}
 }
 
 // AquireAll function increments semaphore till its maximum capacity.
