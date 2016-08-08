@@ -7,7 +7,7 @@ import (
 
 // Simple semaphore not visible from outside of programm.
 // It is implemented using golang channels. Functions related to it
-// (like Aquire, Release, etc.) will simply block till they will be able to
+// (like Acquire, Release, etc.) will simply block till they will be able to
 // perform action on semaphore.
 type Semaphore struct {
 	body chan struct{}
@@ -21,8 +21,8 @@ func NewSemaphore(capacity int) *Semaphore {
 	return sem
 }
 
-// Aquire function increments semaphore.
-func (sem *Semaphore) Aquire() {
+// Acquire function increments semaphore.
+func (sem *Semaphore) Acquire() {
 	entry := struct{}{}
 	sem.body <- entry
 }
@@ -32,25 +32,25 @@ func (sem *Semaphore) Release() {
 	<-sem.body
 }
 
-// AquireN function increments semaphore by N. It will return error if N > cap(sem).
-func (sem *Semaphore) AquireN(n int) (err error) {
+// AcquireN function increments semaphore by N. It will return error if N > cap(sem).
+func (sem *Semaphore) AcquireN(n int) (err error) {
 	if cap(sem.body) < n {
-		err = errors.New("Capacity of semaphore is less than aquired value with AquireN.")
+		err = errors.New("Capacity of semaphore is less than acquired value with AcquireN.")
 		return err
 	}
 
 	for i := 0; i < n; i++ {
-		sem.Aquire()
+		sem.Acquire()
 	}
 
 	return err
 }
 
-// AquireNUnsafe function is the same as AquireN except it won't return error if N > cap(sem).
+// AcquireNUnsafe function is the same as AcquireN except it won't return error if N > cap(sem).
 // It will simply block until semaphore is incremented N times.
-func (sem *Semaphore) AquireNUnsafe(n int) {
+func (sem *Semaphore) AcquireNUnsafe(n int) {
 	for i := 0; i < n; i++ {
-		sem.Aquire()
+		sem.Acquire()
 	}
 }
 
@@ -76,10 +76,10 @@ func (sem *Semaphore) ReleaseNUnsafe(n int) {
 	}
 }
 
-// AquireAll function increments semaphore till its maximum capacity.
-func (sem *Semaphore) AquireAll() {
+// AcquireAll function increments semaphore till its maximum capacity.
+func (sem *Semaphore) AcquireAll() {
 	for i := 0; i < cap(sem.body); i++ {
-		sem.Aquire()
+		sem.Acquire()
 	}
 }
 
